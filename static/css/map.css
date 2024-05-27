@@ -1,8 +1,28 @@
+/* 
 body {
     padding: 0;
     margin: 0;
 }
 html, body, #map {
     height: 100%;
+    width: 100vw;
+}
+.main-navbar {
+    z-index: 1000;
+}
+
+.add-restaurant-btn {
+    margin-right: 10px;
+}
+
+.restaurant-modal {
+    z-index: 1000;
+} */
+.container-wrapper {
+    height: 100vh;
+}
+
+.row-wrapper {
+    height: 100vh;
     width: 100vw;
 }

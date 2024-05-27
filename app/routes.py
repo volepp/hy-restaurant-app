@@ -20,7 +20,7 @@ def login_post():
     username = request.form["username"]
     password = request.form["password"]
     
-    query = text("SELECT id, password FROM users WHERE username=:username")
+    query = text("SELECT id, password, is_admin FROM users WHERE username=:username")
     result = db.session.execute(query, {"username": username})
     user = result.fetchone()
     if not user:
@@ -30,6 +30,7 @@ def login_post():
         pw_hash = user.password
         if check_password_hash(pw_hash, password):
             session["username"] = username
+            session["is_admin"] = user.is_admin
             return redirect("/")
         else:
             # TODO: Invalid password
@@ -43,13 +44,15 @@ def register():
 def register_post():
     username = request.form["username"]
     password = request.form["password"]
+    is_admin = request.form["is_admin"] == "on"
 
     pw_hash = generate_password_hash(password)
     query = text("INSERT INTO users (username, password, is_admin) VALUES (:username, :password, :is_admin)")
-    db.session.execute(query, {"username": username, "password": pw_hash, "is_admin": False})
+    db.session.execute(query, {"username": username, "password": pw_hash, "is_admin": is_admin})
     db.session.commit()
 
     session["username"] = username
+    session["is_admin"] = is_admin
     return redirect("/")
 
 @app.route("/logout")
