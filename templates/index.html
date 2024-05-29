@@ -15,35 +15,57 @@ crossorigin=""></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </head>
 <body>
-<div class="container-fluid container-wrapper">
-    <div class="row row-wrapper">
-        <div id="map" class="col-9"></div>
-        <div id="sidebar" class="col-3">
-            <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid container-wrapper">
+        <div class="row row-wrapper">
+            <div id="map" class="col-9"></div>
+            <div id="sidebar" class="col-3">
+                <nav class="navbar navbar-expand-lg">
                 <ul class="navbar-nav mr-auto nav-tabs" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="search-tab" data-bs-toggle="tab" data-bs-target="#sidebarSearch" type="button" role="tab" aria-controls="sidebarSearch" aria-selected="true">Search</button>
                     </li>
+                    {% if session.is_admin %}
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="add-tab" data-bs-toggle="tab" data-bs-target="#sidebarAdd" type="button" role="tab" aria-controls="sidebarAdd" aria-selected="false">Add</button>
                     </li>
-                    {% if session.is_admin %}
                     <li class="nav-item" role="presentation">
                         <a class="nav-link" href="/users">Users</a>
                     </li>
                     {% endif %}
                 </ul>
             </nav>
-
+            
             <div class="tab-content" id="sidebarContent">
                 <!-- Search -->
                 <div class="tab-pane fade show active" id="sidebarSearch" role="tabpanel" aria-labelledby="search-tab">
                     <p>TODO: search</p>
                 </div>
-    
+                
                 <!-- Add -->
                 <div class="tab-pane fade" id="sidebarAdd" role="tabpanel" aria-labelledby="add-tab">
-                    <p>TODO: add</p>
+                    <h3>Add a new restaurant</h3>
+                    <form action="/restaurant" method="POST">
+                        <div class="form-group">
+                            <label for="restaurantName">Name</label>
+                          <input type="text" class="form-control" id="restaurantName" name="restaurantName">
+                        </div>
+                        <div class="form-group">
+                            <label for="restaurantDescription">Description</label>
+                            <textArea type="text" class="form-control" id="restaurantDescription" name="restaurantDescription" rows="5"></textArea>
+                        </div>
+                        <br/>
+                        <h5>Location</h5>
+                        <p><em>Hint: click on the map to set the location</em></p>
+                        <div class="form-group">
+                            <label for="restaurantLatitude">Latitude</label>
+                            <input type="text" class="form-control" id="restaurantLatitude" name="restaurantLatitude"  readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="restaurantLongitude">Longitude</label>
+                            <input type="text" class="form-control" id="restaurantLongitude" name="restaurantLongitude" readonly>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add</button>
+                    </form>
                 </div>
             </div>
 
@@ -51,12 +73,14 @@ crossorigin=""></script>
     </div>
 </div>
 <script src="{{ url_for('static', filename='js/map.js') }}" /></script>
+{% if session.is_admin %}
+<script src="{{ url_for('static', filename='js/add_restaurant.js') }}" /></script>
+{% endif %}
 <script>
-    // {% for marker in markers %}
-    // L.marker([{{ marker['lat'] }}, {{ marker['lon'] }}]).addTo(map)
-    // .bindPopup("{{ marker['popup'] }}")
-    // .openPopup();
-    // {% endfor %}
+{% for r in restaurants %}
+L.marker([{{ r['lat'] }}, {{ r['long'] }}]).addTo(map)
+    .bindPopup("{{ r['name'] }}");
+{% endfor %}
 </script>
 </body>
 </html>

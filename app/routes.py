@@ -1,5 +1,6 @@
 from app import app
 from db import db
+import restaurants
 from flask import redirect, render_template, request, session
 from sqlalchemy import text
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -8,8 +9,8 @@ from werkzeug.security import check_password_hash, generate_password_hash
 def index():
     if "username" not in session:
         return redirect("/login")
-
-    return render_template("index.html")
+    
+    return render_template("index.html", restaurants=restaurants.get_restaurants())
 
 @app.route("/login")
 def login():
@@ -59,4 +60,16 @@ def register_post():
 def logout():
     if "username" in session:
         del session["username"]
+    return redirect("/")
+
+@app.route("/restaurant", methods=["POST"])
+def add_restaurant():
+    name = request.form["restaurantName"]
+    description = request.form["restaurantDescription"]
+    print(request.form)
+    lat = float(request.form["restaurantLatitude"])
+    lng = float(request.form["restaurantLongitude"])
+
+    restaurants.create_restaurant(name, description, lat, lng)
+
     return redirect("/")
