@@ -38,7 +38,24 @@ crossorigin=""></script>
             <div class="tab-content" id="sidebarContent">
                 <!-- Search -->
                 <div class="tab-pane fade show active" id="sidebarSearch" role="tabpanel" aria-labelledby="search-tab">
-                    <p>TODO: search</p>
+                    <form action="/">
+                        <div class="row">
+                            <div class="col-9">
+                                <input type="text" class="form-control" id="restaurantSearch" name="restaurantKeyword">
+                            </div>
+                            <div class="col-3">
+                                <button type="submit" class="btn btn-primary">Search</button>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    <hr>
+                    {% for r in restaurants %}
+                    <h4>{{ r["name"]}}</h4>
+                    <p>{{ r["description"] }}</p>
+                    <p><em>{{ r["lat"]}}, {{ r["long"] }}</em></p>
+                    <hr>
+                    {% endfor %}
                 </div>
                 
                 <!-- Add -->

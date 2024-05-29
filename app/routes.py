@@ -10,7 +10,14 @@ def index():
     if "username" not in session:
         return redirect("/login")
     
-    return render_template("index.html", restaurants=restaurants.get_restaurants())
+    search_keyword = request.args.get("restaurantKeyword")
+    if search_keyword is None or search_keyword == "":
+        restaurant_list = restaurants.get_restaurants()
+    else:
+        restaurant_list = restaurants.get_restaurants_by_keyword(search_keyword)
+        print(restaurant_list)
+    
+    return render_template("index.html", restaurants=restaurant_list)
 
 @app.route("/login")
 def login():
