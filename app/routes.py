@@ -52,7 +52,9 @@ def register():
 def register_post():
     username = request.form["username"]
     password = request.form["password"]
-    is_admin = request.form["is_admin"] == "on"
+    is_admin = False
+    if "is_admin" in request.form:
+        is_admin = request.form["is_admin"] == "on"
 
     pw_hash = generate_password_hash(password)
     query = text("INSERT INTO users (username, password, is_admin) VALUES (:username, :password, :is_admin)")
@@ -69,14 +71,34 @@ def logout():
         del session["username"]
     return redirect("/")
 
+@app.route("/restaurant/<int:id>")
+def restaurant(id):
+    if "username" not in session:
+        return redirect("/login")
+    
+    restaurant = restaurants.get_restaurant_by_id(id)
+    reviews = restaurants.get_reviews_for_restaurant(id)
+    star_avg = round(restaurants.get_restaurant_star_avg(id), 2)
+    return render_template("restaurant.html", restaurant=restaurant, reviews=reviews, star_average=star_avg)
+
 @app.route("/restaurant", methods=["POST"])
 def add_restaurant():
     name = request.form["restaurantName"]
     description = request.form["restaurantDescription"]
-    print(request.form)
     lat = float(request.form["restaurantLatitude"])
     lng = float(request.form["restaurantLongitude"])
 
     restaurants.create_restaurant(name, description, lat, lng)
 
     return redirect("/")
+
+@app.route("/restaurant/<int:id>/review", methods=["POST"])
+def add_review(id):
+    if "username" not in session:
+        return redirect("/login")
+    reviewer = session["username"]
+    stars = request.form["reviewStars"]
+    comment = request.form["reviewComment"]
+
+    restaurants.add_review_for_restaurant(id, reviewer, stars, comment)
+    return redirect(f"/restaurant/{id}")

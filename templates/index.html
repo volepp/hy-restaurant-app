@@ -28,9 +28,6 @@ crossorigin=""></script>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="add-tab" data-bs-toggle="tab" data-bs-target="#sidebarAdd" type="button" role="tab" aria-controls="sidebarAdd" aria-selected="false">Add</button>
                     </li>
-                    <li class="nav-item" role="presentation">
-                        <a class="nav-link" href="/users">Users</a>
-                    </li>
                     {% endif %}
                 </ul>
             </nav>
@@ -51,9 +48,11 @@ crossorigin=""></script>
                     
                     <hr>
                     {% for r in restaurants %}
-                    <h4>{{ r["name"]}}</h4>
-                    <p>{{ r["description"] }}</p>
-                    <p><em>{{ r["lat"]}}, {{ r["long"] }}</em></p>
+                    <a href="/restaurant/{{ r['id']}}" class="restaurant-link">
+                        <h4>{{ r["name"]}} {{'%0.2f'| format(r["star_average"]|float)}}&#9733;</h4>
+                        <p>{{ r["description"] }}</p>
+                        <p><em>{{ r["lat"]}}, {{ r["long"] }}</em></p>
+                    </a>
                     <hr>
                     {% endfor %}
                 </div>
