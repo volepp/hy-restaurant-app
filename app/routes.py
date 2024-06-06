@@ -16,7 +16,6 @@ def index():
         restaurant_list = restaurants.get_restaurants(sort_by=sort_by)
     else:
         restaurant_list = restaurants.get_restaurants_by_keyword(search_keyword, sort_by=sort_by)
-        print(restaurant_list)
     
     return render_template("index.html", restaurants=restaurant_list)
 

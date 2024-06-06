@@ -10,7 +10,6 @@ def get_restaurants(sort_by=None):
                  LEFT JOIN reviews ON restaurants.id = reviews.restaurant_id\
                  GROUP BY restaurants.id \
                  {sort_query}")
-    print(query)
     result = db.session.execute(query)
     return result.fetchall()
 
