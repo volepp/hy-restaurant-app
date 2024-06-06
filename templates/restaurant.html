@@ -12,6 +12,12 @@
     <h1>{{ restaurant["name"] }}</h1>
     <p>{{ restaurant["description"] }}</p>
 
+    {% if session.is_admin %}
+    <form action="/restaurant/{{ restaurant.id }}/delete" method="POST">
+        <button class="btn btn-danger" type="submit">Delete restaurant</button>
+    </form>
+    {% endif %}
+
     <hr>
 
     <h3>Add a review</h3>

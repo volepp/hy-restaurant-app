@@ -71,3 +71,8 @@ def get_restaurant_star_avg(restaurant_id):
     if result[0] is None:
         return 0
     return float(result[0])
+
+def delete_restaurant(restaurant_id):
+    query = text("DELETE FROM restaurants WHERE id=:restaurant_id")
+    db.session.execute(query, {"restaurant_id": restaurant_id})
+    db.session.commit()

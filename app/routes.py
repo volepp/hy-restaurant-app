@@ -1,7 +1,7 @@
 from app import app
 from db import db
 import restaurants
-from flask import redirect, render_template, request, session
+from flask import redirect, render_template, abort, request, session, Response
 from sqlalchemy import text
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -93,6 +93,14 @@ def add_restaurant():
 
     return redirect("/")
 
+@app.route("/restaurant/<int:id>/delete", methods=["POST"])
+def delete_restaurant(id):
+    if "is_admin" not in session or session["is_admin"] == False:
+        abort(401)
+    
+    restaurants.delete_restaurant(id)
+    return redirect("/")
+
 @app.route("/restaurant/<int:id>/review", methods=["POST"])
 def add_review(id):
     if "username" not in session:
@@ -103,3 +111,7 @@ def add_review(id):
 
     restaurants.add_review_for_restaurant(id, reviewer, stars, comment)
     return redirect(f"/restaurant/{id}")
+
+@app.errorhandler(401)
+def custom_401(error):
+    return Response("Unauthorized", 401, {'WWW-Authenticate':'Basic realm="Login Required"'})
