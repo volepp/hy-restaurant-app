@@ -20,6 +20,19 @@ To run, set up a PostgreSQL database with the University of Helsinki's [installa
 
 Once you have PostgreSQL up and running, open the Postgres front-end by running `psql` and run the SQL queries in *schema.sql*.
 
+You can also do that by creating the database with:
+
+```
+$ psql
+user=# CREATE DATABASE <database-name>;
+```
+
+and then running the following command on the command line:
+
+```
+psql -d <database-name> < schema.sql
+```
+
 After PostgreSQL has been set up, you can run the application with the following command:
 
 ```
