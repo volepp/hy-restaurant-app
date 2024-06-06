@@ -11,7 +11,7 @@ Sovelluksen ominaisuuksia ovat:
 - [x] Ylläpitäjä voi lisätä ja poistaa ravintoloita, sekä määritellä ravintolasta näytettävät tiedot
 - [x] Käyttäjä voi hakea ravintoloita avainsanojen perusteella, joita etsitään ravintoloiden nimistä ja kuvauksista.
 - [x] Käyttäjä näkee ravintolat listassa, jossa ravintolat voidaan järjestää ainakin arvostelujen perusteella.
-- [ ] Ylläpitäjä pystyy poistamaan käyttäjän arvion ravintolalta
+- [x] Ylläpitäjä pystyy poistamaan käyttäjän arvion ravintolalta
 - [ ] Ylläpitäjä voi luoda ryhmiä, joihin ravintolat voidaan luokitella. Ravintola voi kuulua yhteen tai useampaan ryhmään.
 
 ## Usage

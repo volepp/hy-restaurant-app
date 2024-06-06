@@ -112,6 +112,14 @@ def add_review(id):
     restaurants.add_review_for_restaurant(id, reviewer, stars, comment)
     return redirect(f"/restaurant/{id}")
 
+@app.route("/restaurant/<int:restaurant_id>/review/<int:review_id>/delete", methods=["POST"])
+def delete_review(restaurant_id, review_id):
+    if "is_admin" not in session or session["is_admin"] == False:
+        abort(401)
+    
+    restaurants.delete_review(review_id)
+    return redirect(f"/restaurant/{restaurant_id}")
+
 @app.errorhandler(401)
 def custom_401(error):
     return Response("Unauthorized", 401, {'WWW-Authenticate':'Basic realm="Login Required"'})

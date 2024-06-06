@@ -54,8 +54,13 @@ def create_restaurant(name, description, lat, lng):
     })
     db.session.commit()
 
+def delete_restaurant(restaurant_id):
+    query = text("DELETE FROM restaurants WHERE id=:restaurant_id")
+    db.session.execute(query, {"restaurant_id": restaurant_id})
+    db.session.commit()
+
 def get_reviews_for_restaurant(restaurant_id):
-    query = text("SELECT reviewer, stars, comment FROM reviews WHERE restaurant_id=:restaurant_id")
+    query = text("SELECT id, reviewer, stars, comment FROM reviews WHERE restaurant_id=:restaurant_id")
     result = db.session.execute(query, {"restaurant_id": restaurant_id})
     return result.fetchall()
 
@@ -72,7 +77,7 @@ def get_restaurant_star_avg(restaurant_id):
         return 0
     return float(result[0])
 
-def delete_restaurant(restaurant_id):
-    query = text("DELETE FROM restaurants WHERE id=:restaurant_id")
-    db.session.execute(query, {"restaurant_id": restaurant_id})
+def delete_review(review_id):
+    query = text("DELETE FROM reviews WHERE id=:review_id")
+    db.session.execute(query, {"review_id": review_id})
     db.session.commit()
