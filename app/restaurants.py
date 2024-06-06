@@ -2,24 +2,40 @@ from db import db
 from sqlalchemy import text, select, func, or_
 from datetime import datetime
 
-def get_restaurants():
-    query = text("\
-                 SELECT restaurants.id, restaurants.name, restaurants.description, restaurants.lat, restaurants.long, AVG(reviews.stars) AS star_average \
+def get_restaurants(sort_by=None):
+    sort_query = format_sort_by_query(sort_by)
+    query = text(f"\
+                 SELECT restaurants.id, restaurants.name, restaurants.description, restaurants.lat, restaurants.long, AVG(COALESCE(reviews.stars, 0)) AS star_average \
                  FROM restaurants \
                  LEFT JOIN reviews ON restaurants.id = reviews.restaurant_id\
-                 GROUP BY restaurants.id")
+                 GROUP BY restaurants.id \
+                 {sort_query}")
+    print(query)
     result = db.session.execute(query)
     return result.fetchall()
 
-def get_restaurants_by_keyword(keyword):
-    query = text("\
-                SELECT restaurants.id, restaurants.name, restaurants.description, restaurants.lat, restaurants.long, AVG(reviews.stars) AS star_average \
+def get_restaurants_by_keyword(keyword, sort_by=None):
+    sort_query = format_sort_by_query(sort_by)
+    query = text(f"\
+                SELECT restaurants.id, restaurants.name, restaurants.description, restaurants.lat, restaurants.long, AVG(COALESCE(reviews.stars, 0)) AS star_average \
                  FROM restaurants \
                  LEFT JOIN reviews ON restaurants.id = reviews.restaurant_id\
-                 WHERE restaurants.name LIKE :keyword OR restaurants.description LIKE :keyword\
-                 GROUP BY restaurants.id")
+                 WHERE UPPER(restaurants.name) LIKE UPPER(:keyword) OR UPPER(restaurants.description) LIKE UPPER(:keyword)\
+                 GROUP BY restaurants.id \
+                 {sort_query}")
     result = db.session.execute(query, {"keyword": f"%{keyword}%"})
     return result.fetchall()
+
+def format_sort_by_query(sort_by):
+    if sort_by == "alphabetical_asc":
+        return "ORDER BY restaurants.name ASC"
+    elif sort_by == "alphabetical_desc":
+        return "ORDER BY restaurants.name DESC"
+    elif sort_by == "rating_asc":
+        return "ORDER BY star_average ASC"
+    elif sort_by == "rating_desc":
+        return "ORDER BY star_average DESC"
+    return ""
 
 def get_restaurant_by_id(id):
     query = text("SELECT * FROM restaurants WHERE id=:id")

@@ -11,10 +11,11 @@ def index():
         return redirect("/login")
     
     search_keyword = request.args.get("restaurantKeyword")
+    sort_by = request.args.get("restaurantSortBy")
     if search_keyword is None or search_keyword == "":
-        restaurant_list = restaurants.get_restaurants()
+        restaurant_list = restaurants.get_restaurants(sort_by=sort_by)
     else:
-        restaurant_list = restaurants.get_restaurants_by_keyword(search_keyword)
+        restaurant_list = restaurants.get_restaurants_by_keyword(search_keyword, sort_by=sort_by)
         print(restaurant_list)
     
     return render_template("index.html", restaurants=restaurant_list)

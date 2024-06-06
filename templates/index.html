@@ -37,15 +37,25 @@ crossorigin=""></script>
                 <div class="tab-pane fade show active" id="sidebarSearch" role="tabpanel" aria-labelledby="search-tab">
                     <form action="/">
                         <div class="row">
-                            <div class="col-9">
+                            <div class="col-7">
                                 <input type="text" class="form-control" id="restaurantSearch" name="restaurantKeyword">
                             </div>
-                            <div class="col-3">
+                            <div class="col-2">
                                 <button type="submit" class="btn btn-primary">Search</button>
                             </div>
+                            <div class="col-3">
+                                <select name="restaurantSortBy" class="form-select" aria-label="Restaurant sort">
+                                    <option selected>Sort by</option>
+                                    <option value="alphabetical_asc">A-Z (asc)</option>
+                                    <option value="alphabetical_desc">A-Z (desc)</option>
+                                    <option value="rating_asc">Rating (asc)</option>
+                                    <option value="rating_desc">Rating (desc)</option>
+                                </select>
+                            </div>
                         </div>
+
                     </form>
-                    
+
                     <hr>
                     {% for r in restaurants %}
                     <a href="/restaurant/{{ r['id']}}" class="restaurant-link">
