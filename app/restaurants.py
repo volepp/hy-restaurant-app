@@ -42,7 +42,6 @@ def get_restaurant_by_id(id):
     return result.fetchone()
 
 def create_restaurant(name, description, lat, lng):
-    # TODO validate fields
     query = text("INSERT INTO restaurants (name, description, lat, long, created_at) VALUES (:name, :desc, :lat, :lng, :created_at)")
     db.session.execute(query, {
         "name": name,
@@ -52,6 +51,19 @@ def create_restaurant(name, description, lat, lng):
         "created_at": datetime.now()
     })
     db.session.commit()
+
+def validate_restaurant(name, description, lat, long):
+    errors = []
+    # Name must be 3-20 characters
+    if len(name) < 3 or len(name) > 20:
+        errors.append("name")
+    # Description must be 3-240 characters
+    if len(description) < 3 or len(description) > 240:
+        errors.append("description")
+    if len(lat) == 0 or len(long) == 0:
+        errors.append("location")
+
+    return errors
 
 def delete_restaurant(restaurant_id):
     query = text("DELETE FROM restaurants WHERE id=:restaurant_id")
@@ -64,10 +76,20 @@ def get_reviews_for_restaurant(restaurant_id):
     return result.fetchall()
 
 def add_review_for_restaurant(restaurant_id, reviewer, stars, comment):
-    # TODO: validate stars and comment
     query = text("INSERT INTO reviews (restaurant_id, reviewer, stars, comment) VALUES (:restaurant_id, :reviewer, :stars, :comment)")
     db.session.execute(query, {"restaurant_id": restaurant_id, "reviewer": reviewer, "stars": stars, "comment": comment})
     db.session.commit()
+
+def validate_review(stars, comment):
+    errors = []
+    # Can give only 1-5 stars
+    if stars < 1 or stars > 5:
+        errors.append("stars")
+    # Comment must be 3-240 characters
+    if len(comment) < 3 or len(comment) > 240:
+        errors.append("comment")
+    
+    return errors
 
 def get_restaurant_star_avg(restaurant_id):
     query = text("SELECT AVG(stars) AS star_avg FROM reviews WHERE restaurant_id=:restaurant_id")

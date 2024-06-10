@@ -73,22 +73,31 @@ crossorigin=""></script>
                     <form action="/restaurant" method="POST">
                         <div class="form-group">
                             <label for="restaurantName">Name</label>
-                          <input type="text" class="form-control" id="restaurantName" name="restaurantName">
+                          <input type="text" class="form-control" id="restaurantName" name="restaurantName" required>
+                          <div class="invalid-feedback">
+                              Name must be 3 to 20 characters
+                          </div>
                         </div>
                         <div class="form-group">
                             <label for="restaurantDescription">Description</label>
-                            <textArea type="text" class="form-control" id="restaurantDescription" name="restaurantDescription" rows="5"></textArea>
+                            <textArea type="text" class="form-control" id="restaurantDescription" name="restaurantDescription" rows="5" minlength="3" maxlength="240" required></textArea>
+                            <div class="invalid-feedback">
+                                Description must be 3 to 240 characters
+                            </div>
                         </div>
                         <br/>
                         <h5>Location</h5>
                         <p><em>Hint: click on the map to set the location</em></p>
                         <div class="form-group">
                             <label for="restaurantLatitude">Latitude</label>
-                            <input type="text" class="form-control" id="restaurantLatitude" name="restaurantLatitude"  readonly>
+                            <input type="text" class="form-control" id="restaurantLatitude" name="restaurantLatitude" readonly required>
                         </div>
                         <div class="form-group">
                             <label for="restaurantLongitude">Longitude</label>
-                            <input type="text" class="form-control" id="restaurantLongitude" name="restaurantLongitude" readonly>
+                            <input type="text" class="form-control" id="restaurantLongitude" name="restaurantLongitude" readonly required>
+                            <div class="invalid-feedback">
+                                Location is required
+                            </div>
                         </div>
                         <button type="submit" class="btn btn-primary">Add</button>
                     </form>
@@ -98,7 +107,7 @@ crossorigin=""></script>
         </div>
     </div>
 </div>
-<script src="{{ url_for('static', filename='js/map.js') }}" /></script>
+<script src="{{ url_for('static', filename='js/index.js') }}" /></script>
 {% if session.is_admin %}
 <script src="{{ url_for('static', filename='js/add_restaurant.js') }}" /></script>
 {% endif %}

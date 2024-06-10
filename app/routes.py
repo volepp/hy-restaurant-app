@@ -1,9 +1,9 @@
 from app import app
 from db import db
 import restaurants
+import users
 from flask import redirect, render_template, abort, request, session, Response
 from sqlalchemy import text
-from werkzeug.security import check_password_hash, generate_password_hash
 
 @app.route("/")
 def index():
@@ -28,21 +28,16 @@ def login_post():
     username = request.form["username"]
     password = request.form["password"]
     
-    query = text("SELECT id, password, is_admin FROM users WHERE username=:username")
-    result = db.session.execute(query, {"username": username})
-    user = result.fetchone()
+    user = users.get_user(username)
     if not user:
-        # TODO: Invalid username
-        pass
+        return redirect("/login?error=true")
+    elif users.is_valid_password(user, password):
+        session["username"] = username
+        session["is_admin"] = user.is_admin
+        return redirect("/")
     else:
-        pw_hash = user.password
-        if check_password_hash(pw_hash, password):
-            session["username"] = username
-            session["is_admin"] = user.is_admin
-            return redirect("/")
-        else:
-            # TODO: Invalid password
-            pass
+        # Invalid password
+        return redirect("/login?error=true")
 
 @app.route("/register")
 def register():
@@ -56,10 +51,11 @@ def register_post():
     if "is_admin" in request.form:
         is_admin = request.form["is_admin"] == "on"
 
-    pw_hash = generate_password_hash(password)
-    query = text("INSERT INTO users (username, password, is_admin) VALUES (:username, :password, :is_admin)")
-    db.session.execute(query, {"username": username, "password": pw_hash, "is_admin": is_admin})
-    db.session.commit()
+    validation_errors = users.validate_user(username, password)
+    if len(validation_errors) > 0:
+        err_str = ",".join(validation_errors)
+        return redirect(f"/register?errors={err_str}")
+    users.create_user(username, password, is_admin)
 
     session["username"] = username
     session["is_admin"] = is_admin
@@ -85,8 +81,16 @@ def restaurant(id):
 def add_restaurant():
     name = request.form["restaurantName"]
     description = request.form["restaurantDescription"]
-    lat = float(request.form["restaurantLatitude"])
-    lng = float(request.form["restaurantLongitude"])
+    lat_str = request.form["restaurantLatitude"]
+    lng_str = request.form["restaurantLongitude"]
+
+    validation_errors = restaurants.validate_restaurant(name, description, lat_str, lng_str)
+    if len(validation_errors) > 0:
+        err_str = ",".join(validation_errors)
+        return redirect(f"/?addErrors={err_str}")
+    
+    lat = float(lat_str)
+    lng = float(lng_str)
 
     restaurants.create_restaurant(name, description, lat, lng)
 
@@ -105,8 +109,13 @@ def add_review(id):
     if "username" not in session:
         return redirect("/login")
     reviewer = session["username"]
-    stars = request.form["reviewStars"]
+    stars = int(request.form["reviewStars"])
     comment = request.form["reviewComment"]
+
+    validation_errors = restaurants.validate_review(stars, comment)
+    if len(validation_errors) > 0:
+        err_str = ",".join(validation_errors)
+        return redirect(f"/restaurant/{id}?reviewErrors={err_str}")
 
     restaurants.add_review_for_restaurant(id, reviewer, stars, comment)
     return redirect(f"/restaurant/{id}")

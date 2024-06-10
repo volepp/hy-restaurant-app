@@ -18,6 +18,9 @@
             <div class="form-group">
                 <label for="passwordInput">Password</label>
                 <input type="password" id="passwordInput" name="password" class="form-control"></p>
+                <div class="invalid-feedback">
+                    Invalid username or password
+                </div>
             </div>
             <input type="submit" value="Sign in" class="btn btn-primary">
         </form>
@@ -27,4 +30,5 @@
         </div>
     </div>
 </body>
+<script src="{{ url_for('static', filename='js/login.js') }}" /></script>
 </html>
