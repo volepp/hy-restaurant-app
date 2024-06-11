@@ -12,7 +12,7 @@ Sovelluksen ominaisuuksia ovat:
 - [x] Käyttäjä voi hakea ravintoloita avainsanojen perusteella, joita etsitään ravintoloiden nimistä ja kuvauksista.
 - [x] Käyttäjä näkee ravintolat listassa, jossa ravintolat voidaan järjestää ainakin arvostelujen perusteella.
 - [x] Ylläpitäjä pystyy poistamaan käyttäjän arvion ravintolalta
-- [ ] Ylläpitäjä voi luoda ryhmiä, joihin ravintolat voidaan luokitella. Ravintola voi kuulua yhteen tai useampaan ryhmään.
+- [x] Ylläpitäjä voi luoda ryhmiä, joihin ravintolat voidaan luokitella. Ravintola voi kuulua yhteen tai useampaan ryhmään.
 
 ## Usage
 
@@ -30,13 +30,24 @@ user=# CREATE DATABASE <database-name>;
 and then running the following command on the command line:
 
 ```
-psql -d <database-name> < schema.sql
+$ psql -d <database-name> < schema.sql
 ```
 
-After PostgreSQL has been set up, you can run the application with the following command:
+After PostgreSQL has been set up, create a virtual environment (optional) and install the required Python dependencies with:
 
 ```
-DB_SECRET=<secret> flask --app app/app.py run
+# Optional
+$ python3 -m venv venv 
+$ source venv/bin/activate # For Linux
+
+# Required
+$ pip3 install -r requirements.txt
+```
+
+Now you can run the application with the following command:
+
+```
+$ DB_SECRET=<secret> flask --app app/app.py run
 ```
 
 Generate yourself a secret using e.g. the Python terminal:
