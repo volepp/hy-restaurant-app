@@ -16,7 +16,7 @@ def index():
         restaurant_list = restaurants.get_restaurants(sort_by=sort_by)
     else:
         restaurant_list = restaurants.get_restaurants_by_keyword(search_keyword, sort_by=sort_by)
-    
+
     return render_template("index.html", restaurants=restaurant_list)
 
 @app.route("/login")
@@ -75,7 +75,9 @@ def restaurant(id):
     restaurant = restaurants.get_restaurant_by_id(id)
     reviews = restaurants.get_reviews_for_restaurant(id)
     star_avg = round(restaurants.get_restaurant_star_avg(id), 2)
-    return render_template("restaurant.html", restaurant=restaurant, reviews=reviews, star_average=star_avg)
+    groups = restaurants.get_restaurant_groups(id)
+    all_groups = restaurants.get_all_groups()
+    return render_template("restaurant.html", restaurant=restaurant, reviews=reviews, star_average=star_avg, groups=groups, all_groups=all_groups)
 
 @app.route("/restaurant", methods=["POST"])
 def add_restaurant():
@@ -126,6 +128,50 @@ def delete_review(restaurant_id, review_id):
         abort(401)
     
     restaurants.delete_review(review_id)
+    return redirect(f"/restaurant/{restaurant_id}")
+
+@app.route("/restaurant/<int:restaurant_id>/groups/new", methods=["POST"])
+def add_new_group(restaurant_id):
+    if "is_admin" not in session or session["is_admin"] == False:
+        abort(401)
+
+    name = request.form["newGroupName"]
+    validation_errors = restaurants.validate_group(name)
+    if len(validation_errors) > 0:
+        return redirect(f"/restaurant/{restaurant_id}")
+    
+    new_group_id = restaurants.create_group(name)
+    restaurants.add_restaurant_to_group(restaurant_id, new_group_id)
+    return redirect(f"/restaurant/{restaurant_id}")
+
+@app.route("/restaurant/<int:restaurant_id>/groups/existing", methods=["POST"])
+def add_existing_group(restaurant_id):
+    if "is_admin" not in session or session["is_admin"] == False:
+        abort(401)
+        
+    existing_group_name = request.form["existingGroupName"]
+    group_id = restaurants.get_group_id_by_name(existing_group_name)
+    if group_id == -1:
+        # Group not found
+        return redirect(f"/restaurant/{restaurant_id}")
+
+    if not restaurants.restaurant_belongs_to_group(restaurant_id, group_id):
+        restaurants.add_restaurant_to_group(restaurant_id, group_id)
+
+    return redirect(f"/restaurant/{restaurant_id}")
+
+@app.route("/restaurant/<int:restaurant_id>/groups/remove", methods=["POST"])
+def remove_group(restaurant_id):
+    if "is_admin" not in session or session["is_admin"] == False:
+        abort(401)
+
+    group_name = request.form["deleteGroupName"]
+    group_id = restaurants.get_group_id_by_name(group_name)
+    if group_id == -1:
+        # Group not found
+        return redirect(f"/restaurant/{restaurant_id}")
+    
+    restaurants.remove_restaurant_from_group(restaurant_id, group_id)
     return redirect(f"/restaurant/{restaurant_id}")
 
 @app.errorhandler(401)

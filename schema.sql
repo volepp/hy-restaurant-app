@@ -28,3 +28,20 @@ CREATE TABLE reviews (
         REFERENCES users(username)
         ON DELETE SET NULL
 );
+CREATE TABLE groups (
+    id SERIAL PRIMARY KEY,
+    name TEXT UNIQUE
+);
+CREATE TABLE restaurants_groups (
+    restaurant_id int,
+    group_id int,
+
+    CONSTRAINT fk_restaurant
+        FOREIGN KEY(restaurant_id)
+        REFERENCES restaurants(id)
+        ON DELETE SET NULL,
+    CONSTRAINT fk_group
+        FOREIGN KEY(group_id)
+        REFERENCES groups(id)
+        ON DELETE SET NULL
+);

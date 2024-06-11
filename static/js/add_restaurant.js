@@ -30,10 +30,9 @@ document.onreadystatechange = () => {
                             break;
                 }
                 })
+                // Set restaurant add tab active
+                document.getElementById("add-tab").click();
             };
     });
-
-    // Set restaurant add tab active
-    document.getElementById("add-tab").click();
 }
 
