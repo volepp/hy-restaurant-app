@@ -9,15 +9,19 @@ from sqlalchemy import text
 def index():
     if "username" not in session:
         return redirect("/login")
-    
+
+    filter_groups = request.args.getlist("filterGroups")
+    if len(filter_groups) == 0: filter_groups = None
     search_keyword = request.args.get("restaurantKeyword")
     sort_by = request.args.get("restaurantSortBy")
     if search_keyword is None or search_keyword == "":
-        restaurant_list = restaurants.get_restaurants(sort_by=sort_by)
+        restaurant_list = restaurants.get_restaurants(groups=filter_groups, sort_by=sort_by)
     else:
-        restaurant_list = restaurants.get_restaurants_by_keyword(search_keyword, sort_by=sort_by)
+        restaurant_list = restaurants.get_restaurants_by_keyword(search_keyword, groups=filter_groups, sort_by=sort_by)
 
-    return render_template("index.html", restaurants=restaurant_list)
+    all_groups = restaurants.get_all_groups()
+
+    return render_template("index.html", restaurants=restaurant_list, groups=all_groups)
 
 @app.route("/login")
 def login():

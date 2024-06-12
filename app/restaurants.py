@@ -2,22 +2,26 @@ from db import db
 from sqlalchemy import text, select, func, or_
 from datetime import datetime
 
-def get_restaurants(sort_by=None):
+def get_restaurants(groups=None, sort_by=None):
+    groups_query = format_group_filter_query(groups)
     sort_query = format_sort_by_query(sort_by)
     query = text(f"\
                  SELECT restaurants.id, restaurants.name, restaurants.description, restaurants.lat, restaurants.long, AVG(COALESCE(reviews.stars, 0)) AS star_average \
                  FROM restaurants \
+                 {groups_query} \
                  LEFT JOIN reviews ON restaurants.id = reviews.restaurant_id\
                  GROUP BY restaurants.id \
                  {sort_query}")
     result = db.session.execute(query)
     return result.fetchall()
 
-def get_restaurants_by_keyword(keyword, sort_by=None):
+def get_restaurants_by_keyword(keyword, groups=None, sort_by=None):
+    groups_query = format_group_filter_query(groups)
     sort_query = format_sort_by_query(sort_by)
     query = text(f"\
                 SELECT restaurants.id, restaurants.name, restaurants.description, restaurants.lat, restaurants.long, AVG(COALESCE(reviews.stars, 0)) AS star_average \
                  FROM restaurants \
+                 {groups_query} \
                  LEFT JOIN reviews ON restaurants.id = reviews.restaurant_id\
                  WHERE UPPER(restaurants.name) LIKE UPPER(:keyword) OR UPPER(restaurants.description) LIKE UPPER(:keyword)\
                  GROUP BY restaurants.id \
@@ -35,6 +39,16 @@ def format_sort_by_query(sort_by):
     elif sort_by == "rating_desc":
         return "ORDER BY star_average DESC"
     return ""
+
+def format_group_filter_query(groups):
+    if groups is None:
+        return ""
+    
+    groups_str = ",".join(f"'{group}'" for group in groups)
+    return \
+        f"INNER JOIN (SELECT RG.restaurant_id, groups.id, groups.name FROM groups, ( \
+            SELECT restaurant_id, group_id FROM restaurants_groups \
+          ) AS RG WHERE groups.id = RG.group_id) G ON G.restaurant_id=restaurants.id AND G.name in ({groups_str})"
 
 def get_restaurant_by_id(id):
     query = text("SELECT * FROM restaurants WHERE id=:id")
