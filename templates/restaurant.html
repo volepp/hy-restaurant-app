@@ -10,19 +10,21 @@
 <body>
     <a href="/">Back</a>
     <h1>{{ restaurant["name"] }}</h1>
-    {% for group in groups %}
-    <form class="form-inline" action="/restaurant/{{ restaurant.id }}/groups/remove" method="POST">
-        <input type="hidden" name="deleteGroupName" value="{{ group.name }}">
-        <button class="badge btn rounded-pill bg-info" type="submit">{{ group["name"] }} &#10006</button>
-    </form>
-    {% endfor %}
     {% if session.is_admin %}
+    <div class="row ms-auto">
+        {% for group in groups %}
+        <form class="form-group col-auto" style="padding-right: 0;" action="/restaurant/{{ restaurant.id }}/groups/remove" method="POST">
+            <input type="hidden" name="deleteGroupName" value="{{ group.name }}">
+            <button class="badge btn rounded-pill bg-info" type="submit">{{ group["name"] }} &#10006</button>
+        </form>
+        {% endfor %}
+        
+        <!-- Add group modal -->
+        <button type="button" class="badge btn rounded-pill btn-secondary btn-sm col-auto" data-bs-toggle="modal" data-bs-target="#addGroupModal">
+            Add group
+        </button>
+    </div>
 
-    <!-- Add group modal -->
-    <button type="button" class="badge btn rounded-pill btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#addGroupModal">
-        Add group
-    </button>
-    
     <div class="modal fade" id="addGroupModal" tabindex="-1" aria-labelledby="addGroupModalLabel" aria-hidden="true">
         <div class="modal-dialog">
         <div class="modal-content">
@@ -58,6 +60,10 @@
         </div>
         </div>
     </div>
+    {% else %}
+    {% for group in groups %}
+    <span class="badge rounded-pill bg-info">{{ group["name"] }}</span>
+    {% endfor %}
     {% endif %}
 
     <p style="margin-top: 10px">{{ restaurant["description"] }}</p>
