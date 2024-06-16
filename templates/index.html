@@ -41,6 +41,7 @@ crossorigin=""></script>
                 <!-- Search -->
                 <div class="tab-pane fade show active" id="sidebarSearch" role="tabpanel" aria-labelledby="search-tab">
                     <form action="/">
+                        <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />  
                         <div class="row">
                             <select class="selectpicker" multiple aria-label="size 3 select filterGroups" title="Filter by groups" name="filterGroups">
                                 {% for group in groups %}
@@ -85,6 +86,7 @@ crossorigin=""></script>
                 <div class="tab-pane fade" id="sidebarAdd" role="tabpanel" aria-labelledby="add-tab">
                     <h3>Add a new restaurant</h3>
                     <form action="/restaurant" method="POST">
+                        <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />  
                         <div class="form-group">
                             <label for="restaurantName">Name</label>
                           <input type="text" class="form-control" id="restaurantName" name="restaurantName" required>

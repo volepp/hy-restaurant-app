@@ -11,6 +11,7 @@
     <div class="container login-form">
         <h1>Sign in</h1>
         <form action="/login" method="POST">
+            <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />  
             <div class="form-group">
                 <label for="usernameInput">Username</label>
                 <input type="text" id="usernameInput" name="username" class="form-control"></p>

@@ -14,6 +14,7 @@
     <div class="row ms-auto">
         {% for group in groups %}
         <form class="form-group col-auto" style="padding-right: 0;" action="/restaurant/{{ restaurant.id }}/groups/remove" method="POST">
+            <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />  
             <input type="hidden" name="deleteGroupName" value="{{ group.name }}">
             <button class="badge btn rounded-pill bg-info" type="submit">{{ group["name"] }} &#10006</button>
         </form>
@@ -34,6 +35,7 @@
             </div>
             <div class="modal-body">
                 <form action="/restaurant/{{ restaurant.id }}/groups/existing" method="POST">
+                    <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />  
                     <div class="form-group">
                         <label for="addExistingGroup">Add the restaurant to an existing group</label>
                         <select id="addExistingGroup" class="form-select" name="existingGroupName">
@@ -47,6 +49,7 @@
                 </form>
                 <hr>
                 <form action="/restaurant/{{ restaurant.id }}/groups/new" method="POST">
+                    <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />  
                     <div class="form-group">
                         <label for="addNewGroup">Add the restaurant to a new group</label>
                         <input type="text" id="addNewGroup" class="form-control" name="newGroupName" placeholder="New group name..." minlength="3" maxlength="12" required></select>
@@ -70,6 +73,7 @@
 
     {% if session.is_admin %}
     <form action="/restaurant/{{ restaurant.id }}/delete" method="POST">
+        <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />  
         <button class="btn btn-danger" type="submit">Delete restaurant</button>
     </form>
     {% endif %}
@@ -78,6 +82,7 @@
 
     <h3>Add a review</h3>
     <form action="/restaurant/{{ restaurant.id }}/review" method="POST">
+        <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />  
         <div class="form-group">
             <label for="reviewStars">Stars</label>
             <input type="range" id="reviewStars" name="reviewStars" class="custom-range" min="1" max="5" value="3" oninput="this.nextElementSibling.value = this.value">
@@ -107,6 +112,7 @@
 
     {% if session.is_admin %}
     <form action="/restaurant/{{ restaurant.id }}/review/{{ review.id }}/delete" method="POST">
+        <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />  
         <button class="btn btn-danger btn-sm" type="submit">Delete review</button>
     </form>
     {% endif %}
