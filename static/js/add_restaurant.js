@@ -9,7 +9,7 @@ map.on("click", (e) => {
 });
 
 // Restaurant add error handling
-document.onreadystatechange = () => {
+document.addEventListener("readystatechange", () => {
     previousLatLng = [0, 0]
     window.location.search
         .substring(1)
@@ -33,9 +33,9 @@ document.onreadystatechange = () => {
                 })
                 // Set restaurant add tab active
                 document.getElementById("add-tab").click();
-            } else {
-                // Put back previous values
+            } else { // Restore previous form values
                 switch (param[0]) {
+                    // Restaurant add
                     case "name":
                         document.getElementById("restaurantName").value = param[1]
                         break
@@ -50,6 +50,14 @@ document.onreadystatechange = () => {
                         document.getElementById("restaurantLongitude").value = param[1]
                         previousLatLng[1] = Number(param[1])
                         break
+
+                    // Search
+                    case "restaurantKeyword":
+                        document.getElementById("restaurantSearch").value = param[1]
+                        break
+                    case "restaurantSortBy":
+                        document.getElementById("restaurantSortBy").value = param[1]
+                        break
                 }
             };
     });
@@ -58,4 +66,4 @@ document.onreadystatechange = () => {
         marker.setOpacity(0.5);
     }
 }
-
+);

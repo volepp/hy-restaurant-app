@@ -24,7 +24,7 @@ crossorigin=""></script>
         <div class="row row-wrapper">
             <div id="map" class="col-9"></div>
             <div id="sidebar" class="col-3">
-                <nav class="navbar navbar-expand-lg">
+                <nav class="navbar navbar-expand-lg mb-2" style="height:5vh;">
                 <ul class="navbar-nav mr-auto nav-tabs" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="search-tab" data-bs-toggle="tab" data-bs-target="#sidebarSearch" type="button" role="tab" aria-controls="sidebarSearch" aria-selected="true">Search</button>
@@ -34,32 +34,36 @@ crossorigin=""></script>
                         <button class="nav-link" id="add-tab" data-bs-toggle="tab" data-bs-target="#sidebarAdd" type="button" role="tab" aria-controls="sidebarAdd" aria-selected="false">Add</button>
                     </li>
                     {% endif %}
+                    <a href="/logout" style="text-decoration: none;">
+                        <button class="nav-link">Logout</button>
+                    </a>
                 </ul>
             </nav>
             
             <div class="tab-content" id="sidebarContent">
                 <!-- Search -->
                 <div class="tab-pane fade show active" id="sidebarSearch" role="tabpanel" aria-labelledby="search-tab">
-                    <form action="/">
-                        <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />  
+                    <form style="height:25vh;" action="/">
                         <div class="row">
-                            <select class="selectpicker" multiple aria-label="size 3 select filterGroups" title="Filter by groups" name="filterGroups">
-                                {% for group in groups %}
-                                <option value="{{ group.name }}">{{ group.name }}</option>
-                                {% endfor %}
-                            </select>
+                            <div class="col-12">
+                                <input type="text" class="form-control" id="restaurantSearch" name="restaurantKeyword" placeholder="Search by keyword...">
+                            </div>
                         </div>
 
-                        <div class="row">
-                            <div class="col-7">
-                                <input type="text" class="form-control" id="restaurantSearch" name="restaurantKeyword">
+                        <div class="row mt-2">
+                            <div>
+                                <select class="col-12 selectpicker" multiple aria-label="size 3 select filterGroups" title="Filter groups" name="filterGroups" id="restaurantFilterGroups">
+                                    {% for group in groups %}
+                                    <option value="{{ group.name }}">{{ group.name }}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
-                            <div class="col-2">
-                                <button type="submit" class="btn btn-primary">Search</button>
-                            </div>
-                            <div class="col-3">
-                                <select name="restaurantSortBy" class="form-select" aria-label="Restaurant sort">
-                                    <option selected>Sort by</option>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div>
+                                <select id="restaurantSortBy" name="restaurantSortBy" class="form-select" aria-label="Restaurant sort">
+                                    <option value="" selected>Sort by</option>
                                     <option value="alphabetical_asc">A-Z (asc)</option>
                                     <option value="alphabetical_desc">A-Z (desc)</option>
                                     <option value="rating_asc">Rating (asc)</option>
@@ -68,18 +72,29 @@ crossorigin=""></script>
                             </div>
                         </div>
 
-
+                        <div class="row mt-2">
+                            <div class="col-3">
+                                <a href="/">
+                                    <button type="button" class="btn btn-secondary">Clear</button>
+                                </a>
+                            </div>
+                            <div class="col-3">
+                                <button type="submit" class="btn btn-primary">Search</button>
+                            </div>
+                        </div>
                     </form>
 
                     <hr>
-                    {% for r in restaurants %}
-                    <a href="/restaurant/{{ r['id']}}" class="restaurant-link">
-                        <h4>{{ r["name"]}} {{'%0.2f'| format(r["star_average"]|float)}}&#9733;</h4>
-                        <p>{{ r["description"] }}</p>
-                        <p><em>{{ r["lat"]}}, {{ r["long"] }}</em></p>
-                    </a>
-                    <hr>
-                    {% endfor %}
+                    <div class="overflow-auto" style="height:69vh;">
+                        {% for r in restaurants %}
+                        <a href="/restaurant/{{ r['id']}}" class="restaurant-link">
+                            <h4>{{ r["name"]}} {{'%0.2f'| format(r["star_average"]|float)}}&#9733;</h4>
+                            <p>{{ r["description"] }}</p>
+                            <p><em>{{ r["lat"]}}, {{ r["long"] }}</em></p>
+                        </a>
+                        <hr>
+                        {% endfor %}
+                    </div>
                 </div>
                 
                 <!-- Add -->
