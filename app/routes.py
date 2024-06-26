@@ -2,7 +2,7 @@ from app import app
 from db import db
 import restaurants
 import users
-from flask import redirect, render_template, abort, request, session, Response
+from flask import redirect, render_template, abort, request, session, Response, url_for
 from sqlalchemy import text
 
 @app.route("/")
@@ -20,7 +20,7 @@ def index():
         restaurant_list = restaurants.get_restaurants_by_keyword(search_keyword, groups=filter_groups, sort_by=sort_by)
 
     all_groups = restaurants.get_all_groups()
-
+    
     return render_template("index.html", restaurants=restaurant_list, groups=all_groups)
 
 @app.route("/login")
@@ -85,6 +85,9 @@ def restaurant(id):
 
 @app.route("/restaurant", methods=["POST"])
 def add_restaurant():
+    if "is_admin" not in session or session["is_admin"] == False:
+        abort(401)
+
     name = request.form["restaurantName"]
     description = request.form["restaurantDescription"]
     lat_str = request.form["restaurantLatitude"]
@@ -93,7 +96,7 @@ def add_restaurant():
     validation_errors = restaurants.validate_restaurant(name, description, lat_str, lng_str)
     if len(validation_errors) > 0:
         err_str = ",".join(validation_errors)
-        return redirect(f"/?addErrors={err_str}")
+        return redirect(url_for(".index", addErrors=err_str, name=name, description=description, lat=lat_str, lng=lng_str))
     
     lat = float(lat_str)
     lng = float(lng_str)

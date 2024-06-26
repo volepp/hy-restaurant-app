@@ -10,6 +10,7 @@ map.on("click", (e) => {
 
 // Restaurant add error handling
 document.onreadystatechange = () => {
+    previousLatLng = [0, 0]
     window.location.search
         .substring(1)
         .split("&")
@@ -32,7 +33,29 @@ document.onreadystatechange = () => {
                 })
                 // Set restaurant add tab active
                 document.getElementById("add-tab").click();
+            } else {
+                // Put back previous values
+                switch (param[0]) {
+                    case "name":
+                        document.getElementById("restaurantName").value = param[1]
+                        break
+                    case "description":
+                        document.getElementById("restaurantDescription").value = param[1]
+                        break
+                    case "lat":
+                        document.getElementById("restaurantLatitude").value = param[1]
+                        previousLatLng[0] = Number(param[1])
+                        break
+                    case "lng":
+                        document.getElementById("restaurantLongitude").value = param[1]
+                        previousLatLng[1] = Number(param[1])
+                        break
+                }
             };
     });
+    if (previousLatLng[0] != 0 && previousLatLng[1] != 0) {
+        marker.setLatLng(previousLatLng);
+        marker.setOpacity(0.5);
+    }
 }
 

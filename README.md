@@ -44,6 +44,12 @@ $ source venv/bin/activate # For Linux
 $ pip3 install -r requirements.txt
 ```
 
+Finally create an *.env* file to the project's root with the following content:
+
+```
+DATABASE_URL=postgresql+psycopg2:///<database-name>
+```
+
 Now you can run the application with the following command:
 
 ```
