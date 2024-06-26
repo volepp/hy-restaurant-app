@@ -8,114 +8,118 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </head>
 <body>
-    <a href="/">Back</a>
-    <h1>{{ restaurant["name"] }}</h1>
-    {% if session.is_admin %}
-    <div class="row ms-auto">
+    <div class="container">
+        <a href="/">Back</a>
+
+        <h1>{{ restaurant["name"] }}</h1>
+        <span>Groups:</span>
+        {% if session.is_admin %}
+        <div class="row ms-auto">
+            {% for group in groups %}
+            <form class="form-group col-auto" style="padding-right: 0;" action="/restaurant/{{ restaurant.id }}/groups/remove" method="POST">
+                <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />  
+                <input type="hidden" name="deleteGroupName" value="{{ group.name }}">
+                <button class="badge btn rounded-pill bg-info" type="submit">{{ group["name"] }} &#10006</button>
+            </form>
+            {% endfor %}
+            
+            <!-- Add group modal -->
+            <button type="button" class="badge btn rounded-pill btn-secondary btn-sm col-auto" data-bs-toggle="modal" data-bs-target="#addGroupModal">
+                Add group
+            </button>
+        </div>
+    
+        <div class="modal fade" id="addGroupModal" tabindex="-1" aria-labelledby="addGroupModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="addGroupModalLabel">Add group</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="/restaurant/{{ restaurant.id }}/groups/existing" method="POST">
+                        <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />  
+                        <div class="form-group">
+                            <label for="addExistingGroup">Add the restaurant to an existing group</label>
+                            <select id="addExistingGroup" class="form-select" name="existingGroupName">
+                                <option selected>Choose an existing group...</option>
+                                {% for group in all_groups %}
+                                <option value="{{ group.name }}">{{ group.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <button style="margin-top: 10px" type="submit" class="btn btn-primary form-control">Add</button>
+                        </div>
+                    </form>
+                    <hr>
+                    <form action="/restaurant/{{ restaurant.id }}/groups/new" method="POST">
+                        <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />  
+                        <div class="form-group">
+                            <label for="addNewGroup">Add the restaurant to a new group</label>
+                            <input type="text" id="addNewGroup" class="form-control" name="newGroupName" placeholder="New group name..." minlength="3" maxlength="12" required></select>
+                            <button style="margin-top: 10px" type="submit" class="btn btn-primary form-control">Add</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+            </div>
+        </div>
+        {% else %}
         {% for group in groups %}
-        <form class="form-group col-auto" style="padding-right: 0;" action="/restaurant/{{ restaurant.id }}/groups/remove" method="POST">
-            <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />  
-            <input type="hidden" name="deleteGroupName" value="{{ group.name }}">
-            <button class="badge btn rounded-pill bg-info" type="submit">{{ group["name"] }} &#10006</button>
-        </form>
+        <span class="badge rounded-pill bg-info">{{ group["name"] }}</span>
         {% endfor %}
-        
-        <!-- Add group modal -->
-        <button type="button" class="badge btn rounded-pill btn-secondary btn-sm col-auto" data-bs-toggle="modal" data-bs-target="#addGroupModal">
-            Add group
-        </button>
+        {% endif %}
+    
+        <p style="margin-top: 10px">{{ restaurant["description"] }}</p>
+    
+        {% if session.is_admin %}
+        <form action="/restaurant/{{ restaurant.id }}/delete" method="POST">
+            <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />  
+            <button class="btn btn-danger" type="submit">Delete restaurant</button>
+        </form>
+        {% endif %}
+    
+        <hr>
+    
+        <h3>Add a review</h3>
+        <form action="/restaurant/{{ restaurant.id }}/review" method="POST">
+            <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />  
+            <div class="form-group">
+                <label for="reviewStars">Stars</label>
+                <input type="range" id="reviewStars" name="reviewStars" class="custom-range" min="1" max="5" value="3" oninput="this.nextElementSibling.value = this.value">
+                <output>3</output>
+                <div class="invalid-feedback">
+                    Invalid number of stars
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="reviewComment">Comment</label>
+                <textArea type="text" class="form-control" id="reviewComment" name="reviewComment" rows="5" minlength="3" maxlength="240" required></textArea>
+                <div class="invalid-feedback">
+                    Comment must be 3 to 240 characters
+                </div>
+            </div>
+            <input type="submit" value="Add review" class="btn btn-primary">
+        </form>
+    
+        <hr>
+    
+        <h3>Reviews (average {{ star_average }})</h3>
+        {% for review in reviews %}
+        <hr>
+        <h5>{{ review["reviewer"] }}</h5>
+        {% for _ in range(review["stars"]) %} <span>&#9733;</span> {% endfor %}
+        <p>{{ review["comment"] }}</p>
+    
+        {% if session.is_admin %}
+        <form action="/restaurant/{{ restaurant.id }}/review/{{ review.id }}/delete" method="POST">
+            <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />  
+            <button class="btn btn-danger btn-sm" type="submit">Delete review</button>
+        </form>
+        {% endif %}
+        {% endfor %}
     </div>
-
-    <div class="modal fade" id="addGroupModal" tabindex="-1" aria-labelledby="addGroupModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-            <h5 class="modal-title" id="addGroupModalLabel">Add group</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form action="/restaurant/{{ restaurant.id }}/groups/existing" method="POST">
-                    <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />  
-                    <div class="form-group">
-                        <label for="addExistingGroup">Add the restaurant to an existing group</label>
-                        <select id="addExistingGroup" class="form-select" name="existingGroupName">
-                            <option selected>Choose an existing group...</option>
-                            {% for group in all_groups %}
-                            <option value="{{ group.name }}">{{ group.name }}</option>
-                            {% endfor %}
-                        </select>
-                        <button style="margin-top: 10px" type="submit" class="btn btn-primary form-control">Add</button>
-                    </div>
-                </form>
-                <hr>
-                <form action="/restaurant/{{ restaurant.id }}/groups/new" method="POST">
-                    <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />  
-                    <div class="form-group">
-                        <label for="addNewGroup">Add the restaurant to a new group</label>
-                        <input type="text" id="addNewGroup" class="form-control" name="newGroupName" placeholder="New group name..." minlength="3" maxlength="12" required></select>
-                        <button style="margin-top: 10px" type="submit" class="btn btn-primary form-control">Add</button>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-        </div>
-    </div>
-    {% else %}
-    {% for group in groups %}
-    <span class="badge rounded-pill bg-info">{{ group["name"] }}</span>
-    {% endfor %}
-    {% endif %}
-
-    <p style="margin-top: 10px">{{ restaurant["description"] }}</p>
-
-    {% if session.is_admin %}
-    <form action="/restaurant/{{ restaurant.id }}/delete" method="POST">
-        <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />  
-        <button class="btn btn-danger" type="submit">Delete restaurant</button>
-    </form>
-    {% endif %}
-
-    <hr>
-
-    <h3>Add a review</h3>
-    <form action="/restaurant/{{ restaurant.id }}/review" method="POST">
-        <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />  
-        <div class="form-group">
-            <label for="reviewStars">Stars</label>
-            <input type="range" id="reviewStars" name="reviewStars" class="custom-range" min="1" max="5" value="3" oninput="this.nextElementSibling.value = this.value">
-            <output>3</output>
-            <div class="invalid-feedback">
-                Invalid number of stars
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="reviewComment">Description</label>
-            <textArea type="text" class="form-control" id="reviewComment" name="reviewComment" rows="5" minlength="3" maxlength="240" required></textArea>
-            <div class="invalid-feedback">
-                Description must be 3 to 240 characters
-            </div>
-        </div>
-        <input type="submit" value="Add review" class="btn btn-primary">
-    </form>
-
-    <hr>
-
-    <h3>Reviews (average {{ star_average }})</h3>
-    {% for review in reviews %}
-    <hr>
-    <h5>{{ review["reviewer"] }}</h5>
-    {% for _ in range(review["stars"]) %} <span>&#9733;</span> {% endfor %}
-    <p>{{ review["comment"] }}</p>
-
-    {% if session.is_admin %}
-    <form action="/restaurant/{{ restaurant.id }}/review/{{ review.id }}/delete" method="POST">
-        <input type="hidden" name="csrf_token" value = "{{ csrf_token() }}" />  
-        <button class="btn btn-danger btn-sm" type="submit">Delete review</button>
-    </form>
-    {% endif %}
-    {% endfor %}
 </body>
 </html>
